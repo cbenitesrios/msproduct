@@ -1,4 +1,4 @@
-package com.everis.msclient;
+package com.everis.msproduct;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
