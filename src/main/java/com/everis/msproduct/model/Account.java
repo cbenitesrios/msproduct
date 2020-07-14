@@ -2,6 +2,8 @@ package com.everis.msproduct.model;
  
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document; 
@@ -17,15 +19,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @Document
 @ToString 
-public class Product {
+public class Account {
 	@Id
-	private String id;
-	@Indexed
-	private String productcode;
-	private String producttype;
-	private String productsubtype;
-	private String clientcode;
+	private String id;  
+	@NotNull(message = "Account's type must not be null")
+	private String acctype;
+	@NotNull(message = "Account's titular must not be null")
 	private List<String> titular;
-	private List<String> firmante;
+	private List<String> firmantecode;
 
 }
