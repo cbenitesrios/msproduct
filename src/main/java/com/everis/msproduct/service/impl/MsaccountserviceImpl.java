@@ -28,14 +28,18 @@ public class MsaccountserviceImpl implements IMsaccountservice {
 						} 
 						return Mono.just(a);
 					})
-					.switchIfEmpty(accountrepo.save(Account.builder().titular(cproductrequest.getTitular())
-								.acctype(cproductrequest.getAcctype())
+					.switchIfEmpty(accountrepo.save(Account.builder()
+							    .titular(cproductrequest.getTitular())
+								.saldo(cproductrequest.getSaldo())
+							    .acctype(cproductrequest.getAcctype())
 								.build()));				
 					
 		}else if(cproductrequest.getClienttype().equals("EMP")){ 
 			 return cproductrequest.getAcctype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
 					    .titular(cproductrequest.getTitular())
 						.acctype(cproductrequest.getAcctype())
+						.saldo(cproductrequest.getSaldo())
+						.firmantecode(cproductrequest.getFirmante())
 						.build()):Mono.error(new Exception("No se pudo crear account"));
 		}
 		return Mono.error(new Exception("Error al crear")); 
@@ -53,17 +57,26 @@ public class MsaccountserviceImpl implements IMsaccountservice {
 	
 	@Override
 	public Mono<Account> updateaccount(UpdateaccountRequest updateacc) { 
-		return accountrepo.save(Account.builder()
-				                       .id(updateacc.getId())
-				                       .titular(updateacc.getTitular())
-				                       .acctype(updateacc.getAcctype())
-				                       .firmantecode(updateacc.getFirmante())
-				                       .build());
+		return accountrepo.findById(updateacc.getId())
+				.switchIfEmpty(Mono.error(new Exception("not found")))
+				.flatMap(a-> accountrepo.save(Account.builder()
+	                       .id(a.getId())
+	                       .titular(updateacc.getTitular())
+	                       .acctype(updateacc.getAcctype())
+	                       .saldo(updateacc.getSaldo())
+	                       .firmantecode(updateacc.getFirmante())
+	                       .build()));
+   
 	}
 	
 	@Override
-	public Mono<Void> deleteacc(String id) { 
-		return accountrepo.deleteById(id).switchIfEmpty(Mono.error(new Exception("No encontrado")));
+	public Mono<Void> deleteaccount(String id) { 
+		return accountrepo.findById(id).switchIfEmpty(Mono.error(new Exception("No encontrado"))).flatMap(accountrepo::delete);
+ 	}
+
+	@Override
+	public Mono<Account> findaccbyid(String id) {
+		return accountrepo.findById(id).switchIfEmpty(Mono.error(new Exception("No encontrado")));
 	}
 
 }

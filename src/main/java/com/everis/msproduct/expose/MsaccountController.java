@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController; 
 import com.everis.msproduct.model.Account;
 import com.everis.msproduct.model.request.Createaccrequest;
-import com.everis.msproduct.model.request.UpdateaccountRequest;
-import com.everis.msproduct.repository.IAccountrepo;
+import com.everis.msproduct.model.request.UpdateaccountRequest; 
 import com.everis.msproduct.service.IMsaccountservice;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/apiproduct")
+@RequestMapping("/apiaccount")
 public class MsaccountController {
 
 	  @Autowired
@@ -37,23 +36,28 @@ public class MsaccountController {
 	    
 	    @GetMapping("/findclientacc/{titular}")
 	    public Flux<Account> findclientacc(@PathVariable List<String> titular){
-	     return msproductservice.findclientacc(titular);
+	      return msproductservice.findclientacc(titular);
 	    }
 	    
-	    @GetMapping("/findclientacc")
-	    public Flux<Account> findclientacc(){
-	     return msproductservice.findacc();
+	    @GetMapping("/findacc")
+	    public Flux<Account> findacc(){
+	      return msproductservice.findacc();
+	    }
+	    
+	    @GetMapping("/findacc/{id}")
+	    public Mono<Account> findaccbyid(@PathVariable String id){
+	      return msproductservice.findaccbyid(id);
 	    } 
 	    
 	    @PutMapping("/updateaccount")
 	    @ResponseStatus(code = HttpStatus.CREATED)
-	    public Mono<Account> updateclient(@RequestBody UpdateaccountRequest updateaccount) {
+	    public Mono<Account> updateaccount(@RequestBody UpdateaccountRequest updateaccount) {
 	      return msproductservice.updateaccount(updateaccount);
 	    }
 
 	    @DeleteMapping("/deleteaccount/{id}")
 	    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-	    public Mono<Void> deleteclient(@PathVariable String id) {
+	    public Mono<Void> deleteaccount(@PathVariable String id) {
 	      return msproductservice.deleteaccount(id);
 	    }
 	

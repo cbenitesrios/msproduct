@@ -17,4 +17,5 @@ public class Createaccrequest {
 	private List<String> firmante;
 	private String clienttype;
 	private String acctype;
+	private Double saldo;
 }

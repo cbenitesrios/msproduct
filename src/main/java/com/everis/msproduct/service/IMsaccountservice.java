@@ -16,6 +16,8 @@ public interface IMsaccountservice {
 	   
 	   Flux<Account> findclientacc(List<String> titular);
 	  
+	   Mono<Account> findaccbyid(String id); 
+	  
 	   Flux<Account> findacc();
 
 	   Mono<Void> deleteaccount(String id); 

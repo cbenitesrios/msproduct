@@ -27,5 +27,7 @@ public class Account {
 	@NotNull(message = "Account's titular must not be null")
 	private List<String> titular;
 	private List<String> firmantecode;
+	@Builder.Default
+	private Double saldo=0d;
 
 }
