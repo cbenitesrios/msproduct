@@ -1,7 +1,5 @@
 package com.everis.msproduct.service.impl;
-
-import java.util.List;
-
+ 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +14,10 @@ import com.everis.msproduct.model.request.AccwithdrawRequest;
 import com.everis.msproduct.repository.IAccountrepo;
 import com.everis.msproduct.repository.ICreditrepo;
 import com.everis.msproduct.repository.ITransactionrepo;
-import com.everis.msproduct.service.IMstransacservice;
-
-import lombok.extern.java.Log;
+import com.everis.msproduct.service.IMstransacservice;  
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-@Log
+ 
 @Service
 public class MstransacserviceImpl implements IMstransacservice{
 	
