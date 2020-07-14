@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MwithdrawRequest {
+public class AccwithdrawRequest {
 	
 	private String id;
 	private String prodtype; 

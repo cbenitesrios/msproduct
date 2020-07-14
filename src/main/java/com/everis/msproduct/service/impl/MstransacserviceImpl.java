@@ -1,20 +1,25 @@
 package com.everis.msproduct.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.everis.msproduct.model.Account;
 import com.everis.msproduct.model.Credit;
 import com.everis.msproduct.model.Transaction;
+import com.everis.msproduct.model.request.Creditconsumerequest;
 import com.everis.msproduct.model.request.Creditpaymentrequest;
-import com.everis.msproduct.model.request.MdepositRequest;
-import com.everis.msproduct.model.request.MwithdrawRequest;
+import com.everis.msproduct.model.request.Updatetransactionreq;
+import com.everis.msproduct.model.request.AccdepositRequest;
+import com.everis.msproduct.model.request.AccwithdrawRequest;
 import com.everis.msproduct.repository.IAccountrepo;
 import com.everis.msproduct.repository.ICreditrepo;
 import com.everis.msproduct.repository.ITransactionrepo;
 import com.everis.msproduct.service.IMstransacservice;
 
 import lombok.extern.java.Log;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Log
@@ -29,7 +34,7 @@ public class MstransacserviceImpl implements IMstransacservice{
 	private IAccountrepo accountrepo;
 
 	@Override
-	public Mono<Transaction> moneywithdraw(MwithdrawRequest mwithdrawrequest) { 
+	public Mono<Transaction> moneywithdraw(AccwithdrawRequest mwithdrawrequest) { 
 		return accountrepo.findByIdAndTitularIn(mwithdrawrequest.getId(), mwithdrawrequest.getTitular()) 
 					.switchIfEmpty(Mono.error(new Exception("Not found account - mwithdraw"))) 
 					.filter(acc-> acc.getSaldo()-mwithdrawrequest.getAmount()>=0)
@@ -46,7 +51,7 @@ public class MstransacserviceImpl implements IMstransacservice{
 	}
 
 	@Override
-	public Mono<Transaction> moneydeposit(MdepositRequest mdepositrequest) {
+	public Mono<Transaction> moneydeposit(AccdepositRequest mdepositrequest) {
 		 
 		return accountrepo.findByIdAndTitularIn(mdepositrequest.getId(), mdepositrequest.getTitular())
 				          .switchIfEmpty(Mono.error(new Exception("Not found account - mdeposit")))
@@ -79,22 +84,64 @@ public class MstransacserviceImpl implements IMstransacservice{
 	}
 	
 	@Override
-	public Mono<Transaction> creditconsume(Creditconsumerequest cpaymentrequest) { 
-		return creditrepo.findByIdAndTitular(cpaymentrequest.getId(), cpaymentrequest.getTitular())
-				          .switchIfEmpty(Mono.error(new Exception("Not found account - cpayment")))
-				          .filter(credit -> credit.getConsume()-cpaymentrequest.getAmount()>=0)
-				          .switchIfEmpty(Mono.error(new Exception("Cant process the transaction")))
-				          .flatMap(cre-> refreshpayment(cre,cpaymentrequest.getAmount()))
+	public Mono<Transaction> creditconsume(Creditconsumerequest cconsumerequest) { 
+		return creditrepo.findByIdAndTitular(cconsumerequest.getId(), cconsumerequest.getTitular())				
+				          .switchIfEmpty(Mono.error(new Exception("Not found account - cconsume"))) 
+				          .filter(credit -> (credit.getBaseline()-credit.getConsume()-cconsumerequest.getAmount())>=0)
+				           .switchIfEmpty(Mono.error(new Exception("Cant process the transaction")))
+				          .flatMap(cre-> refreshconsume(cre,cconsumerequest.getAmount()))
 				          .flatMap(then-> transacrepo.save(Transaction.builder()
 								                    .prodid(then.getId())
-								                    .prodtype(cpaymentrequest.getProdtype())
-								                    .transtype("PAYMENT")
-								                    .titular(cpaymentrequest.getTitular())
-								                    .amount(cpaymentrequest.getAmount())
+								                    .prodtype(cconsumerequest.getProdtype())
+								                    .transtype("CONSUME")
+								                    .titular(cconsumerequest.getTitular())
+								                    .amount(cconsumerequest.getAmount())
 								                    .postamount(then.getBaseline()-then.getConsume())
 								                    .build()));
 	}
 	
+	@Override
+	public Mono<Void> deletetransaction(String id) { 
+		return transacrepo.findById(id)
+				.switchIfEmpty(Mono.error(new Exception("No encontrado")))
+				.flatMap(transacrepo::delete);
+	}
+
+	@Override
+	public Flux<Transaction> findclienttransaction(String titular) { 
+		return transacrepo.findByTitular(titular)
+				          .switchIfEmpty(Mono.error(new Exception("Not found transaction")));
+	}
+	
+	@Override
+	public Flux<Transaction> findtransaction() { 
+		return transacrepo.findAll();
+	}
+	
+	@Override
+	public Mono<Transaction> findtransactionbyid(String id) { 
+		return transacrepo.findById(id)
+				          .switchIfEmpty(Mono.error(new Exception("Not found transaction")));
+	}
+	
+	
+	
+	
+	
+	@Override
+	public Mono<Transaction> updatetransaction(Updatetransactionreq updatetransacreq) { 
+		return transacrepo.findById(updatetransacreq.getId())
+				.switchIfEmpty(Mono.error(new Exception("not found")))
+				.flatMap(a-> transacrepo.save(Transaction.builder()
+	                       .id(a.getId())
+	                       .prodid(updatetransacreq.getId())
+	                   	   .prodtype(updatetransacreq.getProdtype()) 
+	                   	   .transtype(updatetransacreq.getTranstype())
+	                   	   .titular(updatetransacreq.getTitular())
+	                   	   .amount(updatetransacreq.getAmount())
+	                   	   .postamount(updatetransacreq.getPostamount()) 
+	                       .build()));
+		}
 	
 	
 	
@@ -110,5 +157,10 @@ public class MstransacserviceImpl implements IMstransacservice{
 		credit.setConsume(credit.getConsume()-amount);
 		return creditrepo.save(credit);
 	}
+	private Mono<Credit> refreshconsume(Credit credit, Double amount) {
+		credit.setConsume(credit.getConsume()+ amount);
+		return creditrepo.save(credit);
+	}
+
 
 }
