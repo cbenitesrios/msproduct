@@ -74,7 +74,7 @@ public class MstransactionController {
 	
     @PutMapping("/updateaccount")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<Account> updatetransaction(@RequestBody Updatetransactionreq updatetransactionreq) {
+    public Mono<Transaction> updatetransaction(@RequestBody Updatetransactionreq updatetransactionreq) {
       return transacservice.updatetransaction(updatetransactionreq);
     }
 

@@ -19,6 +19,6 @@ public interface IMstransacservice {
   Flux<Transaction> findtransaction();
   Flux<Transaction> findclienttransaction(String titular);
   Mono<Transaction> findtransactionbyid(String id);
-  Mono<Transaction> updatetransaction(Updatetransactionreq updatetransactionreq)
+  Mono<Transaction> updatetransaction(Updatetransactionreq updatetransactionreq);
  
 }
