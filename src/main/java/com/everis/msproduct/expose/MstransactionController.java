@@ -10,13 +10,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.everis.msproduct.model.Account;
+import org.springframework.web.bind.annotation.RestController; 
 import com.everis.msproduct.model.Transaction;
 import com.everis.msproduct.model.request.Creditconsumerequest;
-import com.everis.msproduct.model.request.Creditpaymentrequest;
-import com.everis.msproduct.model.request.UpdateaccountRequest;
+import com.everis.msproduct.model.request.Creditpaymentrequest; 
 import com.everis.msproduct.model.request.Updatetransactionreq;
 import com.everis.msproduct.model.request.AccdepositRequest;
 import com.everis.msproduct.model.request.AccwithdrawRequest;

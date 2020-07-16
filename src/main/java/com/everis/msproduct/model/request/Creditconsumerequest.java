@@ -1,6 +1,5 @@
 package com.everis.msproduct.model.request;
-
-import java.util.List;
+ 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
