@@ -3,6 +3,7 @@ package com.everis.msproduct.model;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 import org.springframework.data.annotation.Id; 
 import org.springframework.data.mongodb.core.mapping.Document; 
@@ -27,6 +28,7 @@ public class Account {
 	private List<String> titular;
 	private List<String> firmantecode;
 	@Builder.Default
+	@Positive
 	private Double saldo=0d;
 
 }
