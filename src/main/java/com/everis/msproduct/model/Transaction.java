@@ -1,6 +1,8 @@
 package com.everis.msproduct.model;
  
 
+import java.sql.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,9 +23,10 @@ public class Transaction{
 	@Id
 	private String id;
 	private String prodid;
-	private String prodtype;
+	private String prodtype; 
 	private String transtype;
 	private String titular;
+	private Date transactdate;
 	private Double amount; 
 	private Double postamount; 
 }

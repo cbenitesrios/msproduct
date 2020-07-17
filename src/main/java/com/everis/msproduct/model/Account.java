@@ -18,7 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document
-@ToString 
+@ToString 	
 public class Account {
 	@Id
 	private String id;  
