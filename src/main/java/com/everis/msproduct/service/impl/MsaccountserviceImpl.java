@@ -8,6 +8,7 @@ import com.everis.msproduct.model.Account;
 import com.everis.msproduct.model.request.Createaccrequest;
 import com.everis.msproduct.model.request.UpdateaccountRequest;
 import com.everis.msproduct.repository.IAccountrepo;
+import com.everis.msproduct.repository.IProdtype;
 import com.everis.msproduct.service.IMsaccountservice;  
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,32 +18,64 @@ public class MsaccountserviceImpl implements IMsaccountservice {
 
 	@Autowired
 	private IAccountrepo accountrepo;
+	@Autowired
+	private IProdtype prodtyperepo;
 	
 	@Override
-	public Mono<Account> createacc(Createaccrequest cproductrequest){  
-		if(cproductrequest.getClienttype().equals("PER")){
-			return accountrepo.findByTitularInAndAcctype(cproductrequest.getTitular(), cproductrequest.getAcctype())
-					.flatMap(a ->{
-						if(!a.getTitular().isEmpty()){ 
-							return Mono.error(new Exception("error")); 
-						} 
-						return Mono.just(a);
-					})
-					.switchIfEmpty(accountrepo.save(Account.builder()
-							    .titular(cproductrequest.getTitular())
-								.saldo(cproductrequest.getSaldo())
-							    .acctype(cproductrequest.getAcctype())
-								.build()));				
-					
-		}else if(cproductrequest.getClienttype().equals("EMP")){ 
-			 return cproductrequest.getAcctype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
-					    .titular(cproductrequest.getTitular())
-						.acctype(cproductrequest.getAcctype())
-						.saldo(cproductrequest.getSaldo())
-						.firmantecode(cproductrequest.getFirmante())
-						.build()):Mono.error(new Exception("No se pudo crear account"));
-		}
-		return Mono.error(new Exception("Error al crear")); 
+	public Mono<Account> createacc(Createaccrequest cproductrequest){
+		switch (cproductrequest.getClienttype()) {
+		case "PER":
+			return  prodtyperepo.findByClienttypeAndProductAndProdtype("PER",
+					"ACC", "ACC1")
+					.switchIfEmpty(Mono.error(new Exception("Cant process personal account")))
+					.flatMap(prod->
+					accountrepo.findByTitularInAndAcctype(cproductrequest.getTitular()
+							,cproductrequest.getProducttype())
+					.switchIfEmpty(Mono.error(new Exception("ERROR")))
+					        .filter(acc-> acc.getTitular().isEmpty())
+					        .thenReturn(prod))
+					.flatMap(a -> accountrepo.save(Account.builder()
+						    .titular(cproductrequest.getTitular())
+							.saldo(cproductrequest.getSaldo())
+							.accdescription(a.getProdtypedesc())
+						    .acctype(cproductrequest.getProducttype())
+							.build())); 
+		case "EMP":
+			return prodtyperepo.findByClienttypeAndProductAndProdtype("EMP",
+					cproductrequest.getProduct(), cproductrequest.getProducttype())
+					.switchIfEmpty(Mono.error(new Exception("Cant process empresarial account")))
+					.flatMap(type-> accountrepo.save(Account.builder()
+						    .titular(cproductrequest.getTitular())
+							.acctype(cproductrequest.getProducttype())
+							.saldo(cproductrequest.getSaldo())
+							.firmantecode(cproductrequest.getFirmante())
+							.build()) ) 
+					;
+		case "PVIP":
+			return cproductrequest.getProducttype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
+				    .titular(cproductrequest.getTitular())
+					.acctype(cproductrequest.getProducttype())
+					.saldo(cproductrequest.getSaldo())
+					.firmantecode(cproductrequest.getFirmante())
+					.build()):Mono.error(new Exception("No se pudo crear account"));
+		case "PYME":
+			return cproductrequest.getProducttype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
+				    .titular(cproductrequest.getTitular())
+					.acctype(cproductrequest.getProducttype())
+					.saldo(cproductrequest.getSaldo())
+					.firmantecode(cproductrequest.getFirmante())
+					.build()):Mono.error(new Exception("No se pudo crear account"));
+		case "CORP":
+			return cproductrequest.getProducttype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
+				    .titular(cproductrequest.getTitular())
+					.acctype(cproductrequest.getProducttype())
+					.saldo(cproductrequest.getSaldo())
+					.firmantecode(cproductrequest.getFirmante())
+					.build()):Mono.error(new Exception("No se pudo crear account")); 
+		default:
+			return Mono.error(new Exception("Error al crear")); 
+		} 
+ 
 	}
 
 	@Override

@@ -15,7 +15,8 @@ import lombok.ToString;
 public class Createaccrequest {
 	private List<String> titular;
 	private List<String> firmante;
-	private String clienttype;
-	private String acctype;
+	private String clienttype; 
+	private String product;
+	private String producttype;
 	private Double saldo;
 }

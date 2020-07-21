@@ -1,10 +1,8 @@
 package com.everis.msproduct.model;
- 
-
-import java.sql.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,15 +16,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @Document
 @ToString
-public class Transaction{ 
-	
+public class Prodtype {
 	@Id
 	private String id;
-	private String prodid;
-	private String prodtype; 
-	private String transtype;
-	private String titular;
-	private Date transactdate;
-	private Double amount; 
-	private Double postamount; 
+	private String clienttype;
+	private String product;
+	@Field(name = "prodtype")
+    private String prodtype;
+    private String prodtypedesc;
+    private Double minbalance;
+    private Double maxbalancexmonth;
 }

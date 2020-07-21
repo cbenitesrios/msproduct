@@ -23,20 +23,15 @@ import lombok.ToString;
 @Validated
 public class Credit { 
 	@Id
-	private String id;
-	
+	private String id; 
 	@NotNull(message = "Credit client code must not be null")
-	private String titular; 
-	
+	private String titular;  
 	@NotNull(message = "Credit credi type must not be null")
-	private String credittype;
-	
+	private String credittype; 
 	@NotNull(message = "Credit base line must not be null")
 	@Positive
-	private Double baseline;
-	
-	@Builder.Default
-	@PositiveOrZero
+	private Double baseline; 
+	@Builder.Default 
 	private Double consume=0d;
 	
 
