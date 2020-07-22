@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 
 public interface IAccountrepo extends ReactiveMongoRepository<Account, String>{
  
-	Mono<Account> findByTitularInAndAcctype(List<String> titular, String acctype);
+	Mono<Long> countFindByTitularInAndAcctype(List<String> titular, String acctype);
 	Flux<Account> findByTitularIn(List<String> titular);
 	Flux<Account> findByTitular(String titular); 
 	Mono<Account> findByIdAndTitularIn(String id, List<String> titular);

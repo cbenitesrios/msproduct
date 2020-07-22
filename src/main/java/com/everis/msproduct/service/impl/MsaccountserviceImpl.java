@@ -22,60 +22,26 @@ public class MsaccountserviceImpl implements IMsaccountservice {
 	private IProdtype prodtyperepo;
 	
 	@Override
-	public Mono<Account> createacc(Createaccrequest cproductrequest){
-		switch (cproductrequest.getClienttype()) {
-		case "PER":
-			return  prodtyperepo.findByClienttypeAndProductAndProdtype("PER",
-					"ACC", "ACC1")
-					.switchIfEmpty(Mono.error(new Exception("Cant process personal account")))
-					.flatMap(prod->
-					accountrepo.findByTitularInAndAcctype(cproductrequest.getTitular()
-							,cproductrequest.getProducttype())
-					.switchIfEmpty(Mono.error(new Exception("ERROR")))
-					        .filter(acc-> acc.getTitular().isEmpty())
-					        .thenReturn(prod))
-					.flatMap(a -> accountrepo.save(Account.builder()
-						    .titular(cproductrequest.getTitular())
-							.saldo(cproductrequest.getSaldo())
-							.accdescription(a.getProdtypedesc())
-						    .acctype(cproductrequest.getProducttype())
-							.build())); 
-		case "EMP":
-			return prodtyperepo.findByClienttypeAndProductAndProdtype("EMP",
-					cproductrequest.getProduct(), cproductrequest.getProducttype())
-					.switchIfEmpty(Mono.error(new Exception("Cant process empresarial account")))
-					.flatMap(type-> accountrepo.save(Account.builder()
-						    .titular(cproductrequest.getTitular())
-							.acctype(cproductrequest.getProducttype())
-							.saldo(cproductrequest.getSaldo())
-							.firmantecode(cproductrequest.getFirmante())
-							.build()) ) 
-					;
-		case "PVIP":
-			return cproductrequest.getProducttype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
-				    .titular(cproductrequest.getTitular())
-					.acctype(cproductrequest.getProducttype())
-					.saldo(cproductrequest.getSaldo())
-					.firmantecode(cproductrequest.getFirmante())
-					.build()):Mono.error(new Exception("No se pudo crear account"));
-		case "PYME":
-			return cproductrequest.getProducttype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
-				    .titular(cproductrequest.getTitular())
-					.acctype(cproductrequest.getProducttype())
-					.saldo(cproductrequest.getSaldo())
-					.firmantecode(cproductrequest.getFirmante())
-					.build()):Mono.error(new Exception("No se pudo crear account"));
-		case "CORP":
-			return cproductrequest.getProducttype().equalsIgnoreCase("ACC3")?accountrepo.save(Account.builder()
-				    .titular(cproductrequest.getTitular())
-					.acctype(cproductrequest.getProducttype())
-					.saldo(cproductrequest.getSaldo())
-					.firmantecode(cproductrequest.getFirmante())
-					.build()):Mono.error(new Exception("No se pudo crear account")); 
-		default:
-			return Mono.error(new Exception("Error al crear")); 
-		} 
- 
+	public Mono<Account> createacc(Createaccrequest cproductrequest){ 
+		return  prodtyperepo.findByClienttypeAndProductAndProdtype(cproductrequest.getClienttype(),
+						cproductrequest.getProduct(), cproductrequest.getProducttype()) 
+						.switchIfEmpty(Mono.error(new Exception(String.format("Cant process account %s",cproductrequest.getProducttype()))))
+						.filter(prod-> prod.getMinbalance()<= cproductrequest.getSaldo())
+						.switchIfEmpty(Mono.error(new Exception("Cant process - saldo es menor que el monto de creación"))) 
+						.flatMap(prod-> { 
+							if(prod.getClienttype().equalsIgnoreCase("PER")){
+								return accountrepo.countFindByTitularInAndAcctype(cproductrequest.getTitular(), 
+										cproductrequest.getProducttype()).filter(acc-> acc==0) 
+										.switchIfEmpty(Mono.error(new Exception("No puede haber mas de una cuenta personal")))
+										.then(Mono.just(prod));
+							}
+							return Mono.just(prod); 
+						}).flatMap(prod-> accountrepo.save(Account.builder()
+										    .titular(cproductrequest.getTitular())
+											.saldo(cproductrequest.getSaldo())
+											.accdescription(prod.getProdtypedesc())
+										    .acctype(cproductrequest.getProducttype())
+											.build())); 
 	}
 
 	@Override

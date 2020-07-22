@@ -25,5 +25,6 @@ public class Prodtype {
     private String prodtype;
     private String prodtypedesc;
     private Double minbalance;
-    private Double maxbalancexmonth;
+    private Double minbalancexmonth;
+    private Integer maxsameprod;
 }
