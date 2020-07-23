@@ -28,6 +28,7 @@ public class Credit {
 	private String titular;  
 	@NotNull(message = "Credit credi type must not be null")
 	private String credittype; 
+	private String credittypedesc;
 	@NotNull(message = "Credit base line must not be null")
 	@Positive
 	private Double baseline; 

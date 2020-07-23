@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.everis.msproduct.model.Account;
 import com.everis.msproduct.model.Credit;
+import com.everis.msproduct.model.dto.AccountReport;
+import com.everis.msproduct.model.dto.CreditReport;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,6 @@ import lombok.Setter;
 @Setter
 public class BalanceReport {
   private String titularname;
-  private List<Account> acc;
-  private List<Credit> cred;
+  private List<AccountReport> acc;
+  private List<CreditReport> cred;
 }
