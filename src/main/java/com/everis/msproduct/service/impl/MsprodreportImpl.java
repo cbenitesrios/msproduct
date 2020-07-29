@@ -40,4 +40,16 @@ public class MsprodreportImpl implements IMsprodreport{
 			                 .collectList().map(account-> builder.acc(account).build()))
 			; 
 	}
+	
+	
+	@Override
+	public Mono<BalanceReport> prodtotalreport(String titular) {   
+		 
+	return 	Mono.just(BalanceReport.builder().titularname(titular))
+			.map(builder->  creditrepo.findByTitular(titular).collectList().flatMap(builder::cred));
+			
+			
+		//	.flatMap(builder->  accountrepo.findByTitular(titular).collectList().flatMap(builder::acc));
+			
+	}
 }
