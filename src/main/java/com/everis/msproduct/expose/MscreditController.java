@@ -1,7 +1,6 @@
 package com.everis.msproduct.expose;
  
-import javax.validation.Valid;
-
+import javax.validation.Valid; 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,11 +11,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController; 
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient; 
 import com.everis.msproduct.model.Credit; 
 import com.everis.msproduct.model.request.Createcreditrequ; 
 import com.everis.msproduct.model.request.UpdatecreditRequest;
-import com.everis.msproduct.service.IMscreditservice; 
+import com.everis.msproduct.service.IMscreditservice;  
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,11 +26,15 @@ public class MscreditController {
 	
 	    @Autowired
 	    private IMscreditservice mscreditservice; 
-	  
+	    private static final String URL_TRANSACT= "http://localhost:8040/apitransaction/checkexpired/";
+		   
 	    @PostMapping("/createcred")
 	    @ResponseStatus(code = HttpStatus.CREATED)
 	    public Mono<Credit> createClientPer(@RequestBody @Valid Createcreditrequ ccreditrequest) {
-	      return mscreditservice.createcredit(ccreditrequest);
+	      return  WebClient.create( URL_TRANSACT +ccreditrequest.getTitular())
+	                .get().retrieve().bodyToMono(Boolean.class).filter(expired-> !expired.booleanValue())
+	                .switchIfEmpty(Mono.error(new Exception("Have expired consumes")))
+	                .then( mscreditservice.createcredit(ccreditrequest));
 	    }
 	    
 	    @GetMapping("/findclientcred/{titular}")
