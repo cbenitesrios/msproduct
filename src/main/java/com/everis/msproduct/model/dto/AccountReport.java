@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class AccountReport {
 	private String acctypedesc;
 	private String acctype;
-	private Double saldo;
+	private Double balance;
 }

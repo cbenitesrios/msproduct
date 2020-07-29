@@ -1,8 +1,4 @@
-package com.everis.msproduct.model;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero; 
+package com.everis.msproduct.model; 
 import org.springframework.data.annotation.Id; 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
@@ -23,14 +19,11 @@ import lombok.ToString;
 @Validated
 public class Credit { 
 	@Id
-	private String id; 
-	@NotNull(message = "Credit client code must not be null")
-	private String titular;  
-	@NotNull(message = "Credit credi type must not be null")
-	private String credittype; 
+	private String id;
+	private String credittype;
 	private String credittypedesc;
-	@NotNull(message = "Credit base line must not be null")
-	@Positive
+	private String bank;
+	private String titular;   
 	private Double baseline; 
 	@Builder.Default 
 	private Double consume=0d;

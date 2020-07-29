@@ -7,6 +7,6 @@ import reactor.core.publisher.Mono;
 
 public interface ICreditrepo extends ReactiveMongoRepository<Credit, String>{
 	Flux<Credit> findByTitular(String titular);
-	Mono<Credit> findByIdAndTitular(String id, String titular);
+	Mono<Credit> findByIdAndTitular(String id, String titular); 
 	
 }

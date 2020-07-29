@@ -20,15 +20,15 @@ import lombok.ToString;
 @Document
 @ToString 	
 public class Account {
+
 	@Id
-	private String id;  
-	@NotNull(message = "Account's type must not be null")
+	private String id; 
 	private String acctype;
-	private String accdescription;
-	@NotNull(message = "Account's titular must not be null")
+	private String bank;
+	private String accdescription; 
 	private List<String> titular;
 	private List<String> firmantecode;
 	@Builder.Default 
-	private Double saldo=0d;
+	private Double balance=0d;
 
 }

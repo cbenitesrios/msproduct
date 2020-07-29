@@ -7,6 +7,7 @@ import com.everis.msproduct.model.Credit;
 import com.everis.msproduct.model.request.Createcreditrequ;
 import com.everis.msproduct.model.request.UpdatecreditRequest;
 import com.everis.msproduct.repository.ICreditrepo;
+import com.everis.msproduct.repository.IProdtype;
 import com.everis.msproduct.service.IMscreditservice; 
 
 import reactor.core.publisher.Flux;
@@ -17,14 +18,21 @@ public class MscreditserviceImpl implements IMscreditservice{
 
 	@Autowired
 	private ICreditrepo creditrepo;
+	@Autowired
+	private IProdtype prodtyperepo;
 	
 	@Override
 	public Mono<Credit> createcredit(Createcreditrequ ccreditrequest) { 
-		return creditrepo.save(Credit.builder()
-				               .baseline(ccreditrequest.getBaseline())
-				               .titular(ccreditrequest.getTitular())
-				               .credittype(ccreditrequest.getCredittype())
-				               .build());
+		return  prodtyperepo.findByClienttypeAndProductAndProdtype(ccreditrequest.getClienttype(),
+				ccreditrequest.getProduct(), ccreditrequest.getProducttype())
+				 .switchIfEmpty(Mono.error(new Exception("No encontrado")))
+				 .flatMap(then->creditrepo.save(Credit.builder()
+				                .baseline(ccreditrequest.getBaseline())
+				                .bank(ccreditrequest.getBank())
+				                .titular(ccreditrequest.getTitular())
+				                .credittypedesc(then.getProdtypedesc())
+				                .credittype(ccreditrequest.getProducttype())
+				                .build()));
 	}
 
 	@Override
@@ -48,15 +56,17 @@ public class MscreditserviceImpl implements IMscreditservice{
 	public Mono<Credit> updatecredit(UpdatecreditRequest updatecredit) {
 		return creditrepo.findById(updatecredit.getId())
 				.switchIfEmpty(Mono.error(new Exception("not found")))
-				.flatMap(a->{
-							if(updatecredit.getBaseline()>updatecredit.getConsume())
-								return Mono.error(new Exception("Baseline must be higher than consume"));
-							return creditrepo.save(Credit.builder()
-						   .id(a.getId())
+				.filter(a ->updatecredit.getBaseline()>=updatecredit.getConsume())
+				.switchIfEmpty(Mono.error(new Exception("Baseline must be higher than consume"))) 
+				.then(creditrepo.save(Credit.builder()
+						   .id(updatecredit.getId())
+						   .credittype(updatecredit.getCredittype())
+						   .credittypedesc(updatecredit.getCredittypedesc())
+						   .bank(updatecredit.getBank())						   
 	                       .titular(updatecredit.getTitular())
 	                       .baseline(updatecredit.getBaseline())
 	                       .consume(updatecredit.getConsume())
-	                       .build());});
+	                       .build()));
 	}
 
 	@Override

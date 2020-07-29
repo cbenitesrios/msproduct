@@ -1,5 +1,7 @@
 package com.everis.msproduct.expose;
  
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,7 +29,7 @@ public class MscreditController {
 	  
 	    @PostMapping("/createcred")
 	    @ResponseStatus(code = HttpStatus.CREATED)
-	    public Mono<Credit> createClientPer(@RequestBody Createcreditrequ ccreditrequest) {
+	    public Mono<Credit> createClientPer(@RequestBody @Valid Createcreditrequ ccreditrequest) {
 	      return mscreditservice.createcredit(ccreditrequest);
 	    }
 	    
@@ -48,7 +50,7 @@ public class MscreditController {
 	    
 	    @PutMapping("/updatecredit")
 	    @ResponseStatus(code = HttpStatus.CREATED)
-	    public Mono<Credit> updatecredit(@RequestBody UpdatecreditRequest updatecredit) {
+	    public Mono<Credit> updatecredit(@RequestBody @Valid UpdatecreditRequest updatecredit) {
 	      return mscreditservice.updatecredit(updatecredit);
 	    }
 
