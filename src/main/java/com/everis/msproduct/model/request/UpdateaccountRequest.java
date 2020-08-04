@@ -23,6 +23,7 @@ public class UpdateaccountRequest{
 	private String bank;  
 	@NotNull(message = "acc type- null")
 	private String acctype;
+	@NotNull(message = "acc description- null")
 	private String accdescription;
 	@PositiveOrZero(message = "saldo - null")
 	private Double balance;  

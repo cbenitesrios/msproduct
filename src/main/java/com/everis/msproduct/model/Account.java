@@ -1,5 +1,7 @@
 package com.everis.msproduct.model;
  
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -24,11 +26,12 @@ public class Account {
 	@Id
 	private String id; 
 	private String acctype;
-	private String bank;
-	private String accdescription; 
+	private String accdescription;
+	private String bank; 
 	private List<String> titular;
 	private List<String> firmantecode;
 	@Builder.Default 
 	private Double balance=0d;
-
+	@Builder.Default 
+	private LocalDateTime creationdate=LocalDateTime.now();
 }

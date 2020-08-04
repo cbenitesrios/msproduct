@@ -1,4 +1,7 @@
 package com.everis.msproduct.model; 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id; 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
@@ -23,10 +26,12 @@ public class Credit {
 	private String credittype;
 	private String credittypedesc;
 	private String bank;
-	private String titular;   
+	private String titular;  
 	private Double baseline; 
 	@Builder.Default 
 	private Double consume=0d;
+	@Builder.Default 
+	private LocalDateTime creationdate=LocalDateTime.now();
 	
 
 }
