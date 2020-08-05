@@ -24,6 +24,8 @@ public class MsprodreportImpl implements IMsprodreport{
 	@Autowired
 	IAccountrepo accountrepo;
 	
+	
+	/*Retorna un balance general agrupado de los saldos de cuentas y de consumas de creditos para un titular*/
 	@Override
 	public Mono<BalanceReport> prodbalancereport(String titular) {   
 	return 	Mono.just(BalanceReport.builder().titularname(titular))
@@ -56,7 +58,7 @@ public class MsprodreportImpl implements IMsprodreport{
 
 	@Override
 	public Mono<BankReport> prodbankreport(String bank, LocalDate from, LocalDate to) {
-		return Mono.just(BankReport.builder().from(from).to(to))
+		return Mono.just(BankReport.builder().from(from).to(to).bank(bank))
 				.flatMap(builder->  creditrepo.findByBankAndCreationdateBetween(bank,from,to.plusDays(1)).collectList().map(builder::creditList))
 				.flatMap(builder->  accountrepo.findByBankAndCreationdateBetween(bank,from,to.plusDays(1)).collectList().map(builder::accountList))
 				.map(BankReport.BankReportBuilder::build);
