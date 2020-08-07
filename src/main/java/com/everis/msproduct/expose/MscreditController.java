@@ -8,7 +8,9 @@ import java.util.List;
 import javax.validation.Valid; 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient; 
 import com.everis.msproduct.model.Credit;
+import com.everis.msproduct.model.dto.ErrorDto;
 import com.everis.msproduct.model.request.ClientListFind;
 import com.everis.msproduct.model.request.Createcreditrequ; 
 import com.everis.msproduct.model.request.UpdatecreditRequest;
@@ -35,6 +38,14 @@ public class MscreditController {
 	    private IMscreditservice mscreditservice; 
 	    private static final String URL_TRANSACT= "http://localhost:8040/apitransaction/checkexpired/";
 	    private static final String URL_CLIENT="http://localhost:8020/apiclient";
+	    
+	    
+	      @ExceptionHandler
+		  public Mono<ErrorDto> exception(ServerHttpResponse response, Exception request) {
+			 response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+		    return Mono.just(new ErrorDto(request.getLocalizedMessage(), request.getMessage()));
+		  } 
+	    
 	    
 	    @PostMapping("/createcred")
 	    @ResponseStatus(code = HttpStatus.CREATED)

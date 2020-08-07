@@ -5,12 +5,16 @@ import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.everis.msproduct.model.dto.ErrorDto;
 import com.everis.msproduct.model.response.BalanceReport;
 import com.everis.msproduct.model.response.BankReport;
 import com.everis.msproduct.model.response.TotalReport;
@@ -24,6 +28,11 @@ public class MsprodrepController {
 	@Autowired
 	private IMsprodreport prodreport;
 	
+	@ExceptionHandler
+	public Mono<ErrorDto> exception(ServerHttpResponse response, Exception request) {
+	  response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+	  return Mono.just(new ErrorDto(request.getLocalizedMessage(), request.getMessage()));
+	} 
 	
 	/*Balance acumulado de los saldos que tenga un titular en cuentas y creditos*/
 	@GetMapping("/clientbalance/{titular}")
